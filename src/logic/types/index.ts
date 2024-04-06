@@ -9,4 +9,5 @@ export type Problem = {
     name: string;
     rating: number | undefined;
     tags: string[];
+    id: string;
 }

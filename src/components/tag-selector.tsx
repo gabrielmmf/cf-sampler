@@ -1,6 +1,6 @@
 import * as React from "react"
 import { Check, ChevronsUpDown } from "lucide-react"
-import { fetchAllTags } from "@/logic/fetch"
+import { allTags } from "@/logic/database/tags"
 
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
@@ -23,7 +23,7 @@ type TagSelectorProps = {
 }
 
 
-const tags = fetchAllTags()
+const tags = allTags;
 
 function TagSelector({ onSelectTag }: TagSelectorProps) {
     const [open, setOpen] = React.useState(false)

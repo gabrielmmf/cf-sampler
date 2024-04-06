@@ -1,24 +1,18 @@
-import response from '../database/cf_response.json'
-import { Constraint, Problem } from '../types';
+import { problems } from '../database';
+import { Constraint } from '../types';
+import { generateModel } from './model';
 
-const problems: Problem[] = response.result.problems.map(p => {
-    return {
-        name: p.name,
-        rating: p.rating,
-        tags: p.tags
-    }
-});
+import { solve } from "yalps"
 
 export function generateSample(constraints: Constraint[], n: number) {
 
-    const shuffledProblems = shuffleArray(problems);
+    const model = generateModel(constraints, n);
 
+    const solution = solve(model);
 
-    return shuffledProblems.slice(0, n);
-}
+    const sample = solution.variables.map(v => {
+        return problems.find(p => p.name === v[0]);
+    });
 
-
-function shuffleArray(arr: Problem[]) {
-    arr.sort(() => Math.random() - 0.5);
-    return arr;
+    console.log(sample);
 }
