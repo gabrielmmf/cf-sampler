@@ -58,7 +58,9 @@ function buildTagConstraints(constraints: Constraint[]) {
             "=": "equal",
             ">=": "min"
         }
-        constraintObjects[constraint.tag] = {};
+        if (!constraintObjects[constraint.tag]) {
+            constraintObjects[constraint.tag] = {};
+        }
         constraintObjects[constraint.tag][signalTranslateMap[constraint.signal]] = constraint.number;
     }
 

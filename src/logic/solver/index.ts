@@ -10,6 +10,10 @@ export function generateSample(constraints: Constraint[], n: number) {
 
     const solution = solve(model);
 
+    if(solution.status !== "optimal" ){
+        alert("infactível!!!");
+    }
+
     return problems.filter(prob => {
         return solution.variables.some(v => v[0] === prob.id)
     });

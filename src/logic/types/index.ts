@@ -10,4 +10,5 @@ export type Problem = {
     rating: number | undefined;
     tags: string[];
     id: string;
+    url: string;
 }

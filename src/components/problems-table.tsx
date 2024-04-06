@@ -36,7 +36,7 @@ function getColumns(): ColumnDef<Problem>[] {
             accessorKey: "name",
             header: "Nome",
             cell: ({ row }) => {
-                return <div className="capitalize">{row.getValue("name")}</div>
+                return <div className="capitalize"><Button variant="link" onClick={() => window.open(row.original.url)}>{row.getValue("name")}</Button></div>
             },
         },
         {

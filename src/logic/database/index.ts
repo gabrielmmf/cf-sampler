@@ -9,7 +9,8 @@ const problems: Problem[] = response.result.problems.map(p => {
         name: p.name,
         rating: p.rating,
         tags: p.tags,
-        id: uuidv4()
+        id: uuidv4(),
+        url: `https://codeforces.com/problemset/problem/${p.contestId}/${p.index}`
     }
 });
 
