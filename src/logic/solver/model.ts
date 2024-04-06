@@ -12,8 +12,6 @@ export function generateModel(constraints: Constraint[], n: number) {
         if (availableTags.includes(c.tag)) continue;
         availableTags.push(c.tag);
     }
-
-    console.log(problems[0]);
     return {
         "constraints": {
             ...buildSumConstraint(n),
@@ -23,7 +21,7 @@ export function generateModel(constraints: Constraint[], n: number) {
             ...buildProblemVariables()
         },
         "integers": true,
-        "binaries": problems.map(p => p.name)
+        "binaries": problems.map(p => p.id)
     }
 }
 
@@ -35,13 +33,13 @@ function shuffleArray(arr: Problem[]) {
 
 function buildProblemVariables() {
 
-    const problemVars: { [name: string]: { [tag: string]: number } } = {}
+    const problemVars: { [id: string]: { [tag: string]: number } } = {}
     for (const prob of problems) {
-        problemVars[prob.name] = {};
-        problemVars[prob.name]["total_sum"] = 1;
+        problemVars[prob.id] = {};
+        problemVars[prob.id]["total_sum"] = 1;
         for (const tag of prob.tags) {
             if (!availableTags.includes(tag)) continue;
-            problemVars[prob.name][tag] = 1;
+            problemVars[prob.id][tag] = 1;
         }
     }
     return problemVars;

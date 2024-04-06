@@ -10,9 +10,7 @@ export function generateSample(constraints: Constraint[], n: number) {
 
     const solution = solve(model);
 
-    const sample = solution.variables.map(v => {
-        return problems.find(p => p.name === v[0]);
+    return problems.filter(prob => {
+        return solution.variables.some(v => v[0] === prob.id)
     });
-
-    console.log(sample);
 }

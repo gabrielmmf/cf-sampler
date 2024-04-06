@@ -7,7 +7,7 @@ type TagsContainerProps = {
 export function TagsContainer({ tags }: TagsContainerProps) {
 
     return (
-        <div className="flex items-center justify-center gap-2 overflow-x-scroll">
+        <div className="grid justify-center gap-2">
             {tags?.map((tag, index) => {
                 return <Badge key={index}>{tag}</Badge>
             })}
