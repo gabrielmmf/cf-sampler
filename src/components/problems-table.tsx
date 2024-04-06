@@ -1,3 +1,4 @@
+import { Problem } from "@/logic/types"
 import * as React from "react"
 import {
     ColumnDef,
@@ -11,7 +12,7 @@ import {
     getSortedRowModel,
     useReactTable,
 } from "@tanstack/react-table"
-import { ArrowUpDown, Trash, ArrowLeft, ArrowRight } from "lucide-react"
+import { ArrowUpDown, ArrowLeft, ArrowRight } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import {
@@ -19,7 +20,6 @@ import {
     DropdownMenuCheckboxItem,
     DropdownMenuContent,
 } from "@/components/ui/dropdown-menu"
-import { Input } from "@/components/ui/input"
 import {
     Table,
     TableBody,
@@ -28,78 +28,49 @@ import {
     TableHeader,
     TableRow,
 } from "@/components/ui/table"
-import { Constraint } from "@/logic/types"
+import { TagsContainer } from "./tags-container"
 
-
-function getColumns(removeConstraint: (constraint: Constraint) => void): ColumnDef<Constraint>[] {
+function getColumns(): ColumnDef<Problem>[] {
     return [
         {
-            accessorKey: "signal",
-            header: "Restrição",
+            accessorKey: "name",
+            header: "Nome",
             cell: ({ row }) => {
-
-                const signal = row.getValue("signal");
-
-                const phraseMap = {
-                    ">=": "Pelo menos",
-                    "<=": "No máximo",
-                    "=": "Exatamente"
-                }
-
-                if (signal !== ">=" && signal !== "<=" && signal !== "=") return;
-
-
-                return <div className="capitalize">{phraseMap[signal]}</div>
+                return <div className="capitalize">{row.getValue("name")}</div>
             },
         },
         {
-            accessorKey: "number",
+            accessorKey: "rating",
             header: ({ column }) => {
                 return (
                     <Button
                         variant="ghost"
                         onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
                     >
-                        Número
+                        Rating
                         <ArrowUpDown className="ml-2 h-4 w-4" />
                     </Button>
                 )
             },
-            cell: ({ row }) => <div>{row.getValue("number")}</div>,
+            cell: ({ row }) => <div>{row.getValue("rating")}</div>,
         },
         {
-            accessorKey: "tag",
+            accessorKey: "tags",
             header: () => <div className="text-center">Tags</div>,
             cell: ({ row }) => {
-                return <div className="text-center font-medium">{row.getValue("tag")}</div>
-            },
-        },
-        {
-            id: "remove",
-            enableHiding: false,
-            cell: ({ row }) => {
-                const constraint = row.original
-
-                return (
-                    <div className="flex justify-center">
-                        <Button onClick={() => removeConstraint(constraint)} variant="ghost" className="h-8 w-8 p-0">
-                            <span className="sr-only">Remover limitação</span>
-                            <Trash className="h-4 w-4" />
-                        </Button>
-                    </div>
-                )
+                const tags = row.getValue("tags") as string[];
+                return <TagsContainer tags={tags}></TagsContainer>
             },
         },
     ]
 }
 
-type ConstraintsTableProps = {
-    value: Constraint[],
-    removeConstraint: (constraint: Constraint) => void;
-    generateSample: (constraint: Constraint[], numberOfQuestions: number) => void;
+type ProblemsTableProps = {
+    problems: Problem[];
+    onFinishSampleView: () => void;
 }
 
-export function ConstraintsTable({ value, removeConstraint, generateSample }: ConstraintsTableProps) {
+export default function ProblemsTable({ problems, onFinishSampleView }: ProblemsTableProps) {
     const [sorting, setSorting] = React.useState<SortingState>([])
     const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
         []
@@ -107,24 +78,10 @@ export function ConstraintsTable({ value, removeConstraint, generateSample }: Co
     const [columnVisibility, setColumnVisibility] =
         React.useState<VisibilityState>({})
 
-
-    const [data, setData] = React.useState<Constraint[]>(value);
-
-    const [numberOfQuestions, setNumberOfQuestions] = React.useState<number>();
-
-    const handleNumberOfQuestionsChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setNumberOfQuestions(parseInt(e.target.value));
-    }
-
-
-    React.useEffect(() => {
-        setData(value);
-    }, [value]);
-
-    const columns = getColumns(removeConstraint);
+    const columns = getColumns();
 
     const table = useReactTable({
-        data,
+        data: problems,
         columns,
         onSortingChange: setSorting,
         onColumnFiltersChange: setColumnFilters,
@@ -135,7 +92,7 @@ export function ConstraintsTable({ value, removeConstraint, generateSample }: Co
         onColumnVisibilityChange: setColumnVisibility,
         initialState: {
             pagination: {
-                pageSize: 6
+                pageSize: 10
             }
         },
         state: {
@@ -147,37 +104,27 @@ export function ConstraintsTable({ value, removeConstraint, generateSample }: Co
 
     return (
         <>
-            <div className="flex self-end py-2">
-                <Input
-                    className="w-52"
-                    placeholder="Filtrar por tags..."
-                    value={(table.getColumn("tag")?.getFilterValue() as string) ?? ""}
-                    onChange={(event) =>
-                        table.getColumn("tag")?.setFilterValue(event.target.value)
-                    }
-                />
-                <DropdownMenu>
-                    <DropdownMenuContent align="end">
-                        {table
-                            .getAllColumns()
-                            .filter((column) => column.getCanHide())
-                            .map((column) => {
-                                return (
-                                    <DropdownMenuCheckboxItem
-                                        key={column.id}
-                                        className="capitalize"
-                                        checked={column.getIsVisible()}
-                                        onCheckedChange={(value) =>
-                                            column.toggleVisibility(!!value)
-                                        }
-                                    >
-                                        {column.id}
-                                    </DropdownMenuCheckboxItem>
-                                )
-                            })}
-                    </DropdownMenuContent>
-                </DropdownMenu>
-            </div>
+            <DropdownMenu>
+                <DropdownMenuContent align="end">
+                    {table
+                        .getAllColumns()
+                        .filter((column) => column.getCanHide())
+                        .map((column) => {
+                            return (
+                                <DropdownMenuCheckboxItem
+                                    key={column.id}
+                                    className="capitalize"
+                                    checked={column.getIsVisible()}
+                                    onCheckedChange={(value) =>
+                                        column.toggleVisibility(!!value)
+                                    }
+                                >
+                                    {column.id}
+                                </DropdownMenuCheckboxItem>
+                            )
+                        })}
+                </DropdownMenuContent>
+            </DropdownMenu>
             <div className="overflow-hidden flex rounded-md border w-full h-full">
                 <Table className="overflow-hidden">
                     <TableHeader>
@@ -221,7 +168,7 @@ export function ConstraintsTable({ value, removeConstraint, generateSample }: Co
                                     colSpan={columns.length}
                                     className="h-24 text-center"
                                 >
-                                    Nenhuma limitação adicionada
+                                    Nenhum problema
                                 </TableCell>
                             </TableRow>
                         )}
@@ -247,21 +194,10 @@ export function ConstraintsTable({ value, removeConstraint, generateSample }: Co
                         <ArrowRight />
                     </Button>
                 </div>
-                <div className="flex gap-2 items-center justify-center">
-                    <Input className="w-48" onChange={handleNumberOfQuestionsChange} type="number" min="0" placeholder="Número de questões" />
-                    <Button
-                        size="lg"
-                        onClick={() => {
-                            if (!numberOfQuestions) {
-                                alert("Insira a quantidade desejada de questões aleatórias")
-                                return;
-                            }
-                            generateSample(value, numberOfQuestions)
-                        }}
-                    >
-                        Gerar questões aleatórias
-                    </Button>
-                </div>
+                <Button
+                    onClick={() => onFinishSampleView()}
+
+                >Ok</Button>
             </div>
         </>
     )

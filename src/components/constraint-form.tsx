@@ -1,6 +1,6 @@
 import { ChangeEvent, useState } from "react";
 import TagSelector from "./tag-selector";
-import { Card, CardHeader, CardContent } from "./ui/card";
+import { Card, CardContent } from "./ui/card";
 import {
     Table,
     TableBody,
@@ -26,7 +26,6 @@ function ConstraintForm({ onAddConstraint }: ConstraintFormProps) {
     const [number, setNumber] = useState<number | undefined>(undefined);
 
     const handleTagChange = (selectedTag: string) => {
-        console.log(selectedTag);
         setTag(selectedTag);
     }
 
@@ -53,10 +52,9 @@ function ConstraintForm({ onAddConstraint }: ConstraintFormProps) {
     }
 
     return (
-        <div className="flex justify-around px-12">
-            <Card className="w-full">
-                <CardHeader className="text-center">Escolha restrição a ser adicionada na sua avaliação aleatória</CardHeader>
-                <CardContent className="flex flex-col gap-4 justify-center items-center">
+        <div className="flex justify-center items-center h-full">
+            <Card className="w-full h-full">
+                <CardContent className="flex flex-col gap-4 justify-center items-center py-2">
                     <Table>
                         <TableHeader>
                             <TableRow>
@@ -87,7 +85,7 @@ function ConstraintForm({ onAddConstraint }: ConstraintFormProps) {
                                     </div >
                                 </TableCell>
                                 <TableCell className="font-medium">
-                                    <div className="flex justify-center">
+                                    <div className="flex justify-center items-center">
                                         <TagSelector onSelectTag={handleTagChange}></TagSelector>
                                     </div >
                                 </TableCell>

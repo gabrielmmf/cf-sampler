@@ -7,5 +7,6 @@ export type Constraint = {
 
 export type Problem = {
     name: string;
+    rating: number | undefined;
     tags: string[];
 }
