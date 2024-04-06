@@ -1,9 +1,12 @@
 import { Constraint, Problem } from "../types";
 
+import { Constraint as LibConstraint } from "yalps";
+
 import { problems } from "../database";
 
 const availableTags: string[] = [];
 
+const constraintsMap = new Map<string, LibConstraint>();
 
 export function generateModel(constraints: Constraint[], n: number) {
     shuffleArray(problems);
@@ -12,11 +15,12 @@ export function generateModel(constraints: Constraint[], n: number) {
         if (availableTags.includes(c.tag)) continue;
         availableTags.push(c.tag);
     }
+
+    buildTagConstraints(constraints);
+    buildSumConstraint(n);
+    
     return {
-        "constraints": {
-            ...buildSumConstraint(n),
-            ...buildTagConstraints(constraints)
-        },
+        "constraints": constraintsMap,
         "variables": {
             ...buildProblemVariables()
         },
@@ -46,23 +50,20 @@ function buildProblemVariables() {
 }
 
 function buildSumConstraint(n: number) {
-    return { "total_sum": { "equal": n } };
+    constraintsMap.set("total_sum", { "equal": n });
 }
 
 function buildTagConstraints(constraints: Constraint[]) {
-    const constraintObjects: { [tag: string]: { [signal: string]: number } } = {};
-
     for (const constraint of constraints) {
-        const signalTranslateMap = {
-            "<=": "max",
-            "=": "equal",
-            ">=": "min"
-        }
-        if (!constraintObjects[constraint.tag]) {
-            constraintObjects[constraint.tag] = {};
-        }
-        constraintObjects[constraint.tag][signalTranslateMap[constraint.signal]] = constraint.number;
-    }
 
-    return constraintObjects;
+        if (constraint.signal === "<=") {
+            constraintsMap.set(constraint.tag, { "max": constraint.number });
+        }
+        if (constraint.signal === "=") {
+            constraintsMap.set(constraint.tag, { "equal": constraint.number });
+        }
+        if (constraint.signal === ">=") {
+            constraintsMap.set(constraint.tag, { "min": constraint.number });
+        }
+    }
 }
