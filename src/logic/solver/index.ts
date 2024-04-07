@@ -10,7 +10,7 @@ export function generateSample(constraints: Constraint[], n: number) {
 
     const solution = solve(model);
 
-    if(solution.status !== "optimal" ){
+    if (solution.status !== "optimal") {
         alert("infactível!!!");
     }
 

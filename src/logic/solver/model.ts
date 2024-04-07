@@ -1,15 +1,21 @@
 import { Constraint, Problem } from "../types";
 
-import { Constraint as LibConstraint } from "yalps";
-
 import { problems } from "../database";
+
+type LibConstraint = {
+    equal?: number;
+    min?: number;
+    max?: number;
+};
 
 const availableTags: string[] = [];
 
-const constraintsMap = new Map<string, LibConstraint>();
+let constraintsMap = new Map<string, LibConstraint>();
 
 export function generateModel(constraints: Constraint[], n: number) {
     shuffleArray(problems);
+
+    constraintsMap = new Map<string, LibConstraint>();
 
     for (const c of constraints) {
         if (availableTags.includes(c.tag)) continue;
@@ -18,7 +24,7 @@ export function generateModel(constraints: Constraint[], n: number) {
 
     buildTagConstraints(constraints);
     buildSumConstraint(n);
-    
+
     return {
         "constraints": constraintsMap,
         "variables": {
@@ -56,14 +62,22 @@ function buildSumConstraint(n: number) {
 function buildTagConstraints(constraints: Constraint[]) {
     for (const constraint of constraints) {
 
+        const value = constraintsMap.get(constraint.tag);
+
         if (constraint.signal === "<=") {
-            constraintsMap.set(constraint.tag, { "max": constraint.number });
+            const newVal = (value || {});
+            newVal.max = constraint.number;
+            constraintsMap.set(constraint.tag, newVal);
         }
         if (constraint.signal === "=") {
-            constraintsMap.set(constraint.tag, { "equal": constraint.number });
+            const newVal = (value || {});
+            newVal.equal = constraint.number;
+            constraintsMap.set(constraint.tag, newVal);
         }
         if (constraint.signal === ">=") {
-            constraintsMap.set(constraint.tag, { "min": constraint.number });
+            const newVal = (value || {});
+            newVal.min = constraint.number;
+            constraintsMap.set(constraint.tag, newVal);
         }
     }
 }
