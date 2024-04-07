@@ -29,7 +29,7 @@ function App() {
         alert("Atenção! Existe uma limitação configurada para essa tag. A limitação atual \"exatamente\" sobrescreverá a anterior")
       }
     }
-    setConstraints([...constraints, constraint])
+    setConstraints([constraint, ...constraints])
   }
 
   const handleRemoveConstraint = (constraint: Constraint) => {
